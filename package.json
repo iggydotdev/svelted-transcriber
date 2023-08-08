@@ -1,5 +1,5 @@
 {
-  "name": "svelted-recorder",
+  "name": "svelte-recorder",
   "version": "1.0.0",
   "devDependencies": {
     "npm-run-all": "^4.1.5",
@@ -21,5 +21,5 @@
     "start:dev": "sirv public --dev"
   },
   "keywords": [],
-  "description": "Small audio transcriber, take audio and get text. Edit the text if its not right, copy or download it, or even share it on twitter!"
+  "description": ""
 }

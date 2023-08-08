@@ -5,60 +5,63 @@
 
   let dirty = false;
   let isRunning = false;
-  let speechRecognition = null;
   let innerText = null;
+  let speechRecognition = {};
+  console.log("Setting everything up!");
+  speechRecognition = !!window.SpeechRecognition
+    ? new window.SpeechRecognition()
+    : new window.webkitSpeechRecognition();
 
-  const speechRecognitionSetup = () => {
-    console.log("Setting everything up!");
-    speechRecognition = !!window.SpeechRecognition
-      ? new window.SpeechRecognition()
-      : new window.webkitSpeechRecognition();
+  speechRecognition.interimResults = true;
+  speechRecognition.lang = "en-US";
+  speechRecognition.continous = true;
+  console.log(`this is SR: `, speechRecognition);
+  let newParagraph = document.createElement("p");
 
-    speechRecognition.interimResults = true;
-    speechRecognition.lang = "en-US";
-    speechRecognition.continous = false;
-    let newParagraph = document.createElement("p");
-
-    speechRecognition.onsoundstart = e => {
-      console.info(`The wind whispers me something...`, e);
-    };
-
-    speechRecognition.onsoundend = e => {
-      console.info(`It seems it has stopped.`, e);
-    };
-
-    speechRecognition.onstart = e => {
-      console.info(`Starting speechRecognition`, e);
-    };
-
-    speechRecognition.onend = e => {
-      if (isRunning) {
-        speechRecognition.start();
-      }
-    };
-
-    speechRecognition.onresult = e => {
-      let chunk = Array.from(e.results)
-        .map(result => result[0])
-        .map(result => result.transcript)
-        .join("");
-      newParagraph.textContent = chunk;
-      if (e.results[0].isFinal) {
-        newParagraph = document.createElement("p");
-        newParagraph.setAttribute("contenteditable", true);
-        document.querySelector("#text").appendChild(newParagraph);
-      }
-    };
+  speechRecognition.onsoundstart = e => {
+    console.info(`The wind whispers me something...`, e);
   };
+
+  speechRecognition.onsoundend = e => {
+    console.info(`It seems it has stopped.`, e);
+  };
+
+  // speechRecognition.onstart = e => {
+  //   console.info(`Starting speechRecognition`, e);
+  //   // speechRecognition.end();
+  // };
+
+  speechRecognition.onend = e => {
+    if (isRunning) {
+      speechRecognition.start();
+    }
+  };
+
+  speechRecognition.onresult = e => {
+    console.log(e);
+    let chunk = Array.from(e.results)
+      .map(result => result[0])
+      .map(result => result.transcript)
+      .join("");
+    newParagraph.textContent = chunk;
+    if (e.results[0].isFinal) {
+      newParagraph = document.createElement("p");
+      newParagraph.setAttribute("contenteditable", true);
+      document.querySelector("#text").appendChild(newParagraph);
+    }
+  };
+  console.log(`Setup Completed - `, speechRecognition);
 
   const toggle = () => {
     if (!isRunning) {
       isRunning = true;
       speechRecognition.start();
+      console.log("SR started", speechRecognition);
     } else {
+      speechRecognition.stop();
+      console.log("SR stopped", speechRecognition);
       dirty = document.querySelector("#text").innerText !== "";
       isRunning = false;
-      speechRecognition.stop();
     }
   };
 
@@ -69,7 +72,7 @@
 
   const download = () => {
     innerText = document.querySelector("#text").innerText;
-    textFileAsBlob = new Blob([innerText], {
+    const textFileAsBlob = new Blob([innerText], {
       type: "text/plain"
     });
     let fileNameToSaveAs = "summary.txt";
@@ -86,13 +89,11 @@
     downloadLink.click();
   };
 
-  const setup = () => {
-    speechRecognitionSetup();
-  };
+  // const setup = () => {
+  //   speechRecognitionSetup();
+  // };
 
-  onMount(() => {
-    setup();
-  });
+  //speechRecognitionSetup();
 </script>
 
 
